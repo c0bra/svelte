@@ -15,6 +15,7 @@
 
 <script>
 	import TableOfContents from './_components/TableOfContents.svelte';
+	import TutorialReplToggle from './_components/TutorialReplToggle.svelte';
 	import Icon from '../../../components/Icon.svelte';
 	import Repl from '@sveltejs/svelte-repl';
 	import { getContext } from 'svelte';
@@ -27,6 +28,7 @@
 	let repl;
 	let prev;
 	let scrollable;
+	let show_repl = false;
 	const lookup = new Map();
 
 	sections.forEach(section => {
@@ -102,14 +104,24 @@
 <style>
 	.tutorial-outer {
 		position: relative;
-		height: calc(100vh - var(--nav-h));
+		height: calc(100vh - var(--nav-h) - 4.2rem);
 		overflow: hidden;
 		padding: 0;
 		/* margin: 0 calc(var(--side-nav) * -1); */
 		box-sizing: border-box;
 		display: grid;
-		grid-template-columns: minmax(33.333%, 480px) auto;
+		grid-template-columns: 100vw 100vw;
+		width: 200vw;
 		grid-auto-rows: 100%;
+		transition: all 0.5s;
+	}
+
+	@media (min-width: 600px) {
+		.tutorial-outer {
+			width: 100%;
+			height: calc(100vh - var(--nav-h));
+			grid-template-columns: minmax(33.333%, 480px) auto;
+		}
 	}
 
 	.tutorial-text {
@@ -206,13 +218,17 @@
 	.improve-chapter a:hover {
 		opacity: 1;
 	}
+
+	.offset {
+		transform: translateX(-100vw);
+	}
 </style>
 
 <svelte:head>
 	<title>{selected.section.title} / {selected.chapter.title} • Svelte Tutorial</title>
 </svelte:head>
 
-<div class="tutorial-outer">
+<div class="tutorial-outer" class:offset="{show_repl}">
 	<div class="tutorial-text">
 		<div class="table-of-contents">
 			<TableOfContents {sections} {slug} {selected}/>
@@ -245,3 +261,4 @@
 		<Repl bind:this={repl} {svelteUrl} {rollupUrl} orientation="rows" on:change={handle_change} relaxed/>
 	</div>
 </div>
+<TutorialReplToggle bind:checked={show_repl} />
